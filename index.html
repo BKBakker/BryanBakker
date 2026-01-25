@@ -1,1 +1,776 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bryan Bakker | Reality Verification & Independent Film</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Crimson+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --vault-navy: #0f172a;
+            --parchment: #fef3c7;
+            --verify-blue: #3b82f6;
+            --gold-stamp: #f59e0b;
+            --slate: #334155;
+            --off-white: #f8fafc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--vault-navy);
+            color: var(--parchment);
+            overflow-x: hidden;
+        }
+        
+        /* Paper grain texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, rgba(254, 243, 199, 0.03) 0px, transparent 1px, transparent 2px, rgba(254, 243, 199, 0.03) 3px),
+                repeating-linear-gradient(90deg, rgba(254, 243, 199, 0.03) 0px, transparent 1px, transparent 2px, rgba(254, 243, 199, 0.03) 3px);
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.4;
+        }
+        
+        /* Blockchain hexagon pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill='none' stroke='%233b82f6' stroke-width='0.5' opacity='0.1'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+        }
+        
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        /* Verification badge animation */
+        @keyframes stamp {
+            0% {
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotate(10deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .verification-badge {
+            animation: stamp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-play-state: paused;
+        }
+        
+        .verification-badge.visible {
+            animation-play-state: running;
+        }
+        
+        /* Scroll reveal */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Hero image treatment */
+        .hero-portrait {
+            position: relative;
+            filter: grayscale(100%) contrast(1.2);
+            transition: filter 0.4s ease;
+        }
+        
+        .hero-portrait:hover {
+            filter: grayscale(0%) contrast(1.1);
+        }
+        
+        /* Pillar cards */
+        .pillar-card {
+            background: linear-gradient(135deg, rgba(51, 65, 85, 0.4) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .pillar-card:hover::before {
+            opacity: 1;
+        }
+        
+        .pillar-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.2);
+        }
+        
+        /* Award cards with film negative effect */
+        .award-card {
+            background: rgba(51, 65, 85, 0.3);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .award-card:hover {
+            border-color: rgba(245, 158, 11, 0.6);
+            transform: scale(1.02);
+        }
+        
+        .award-card:hover .film-title {
+            color: var(--gold-stamp);
+        }
+        
+        /* Timeline scrubber */
+        .timeline-container {
+            position: relative;
+            padding: 60px 0;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--verify-blue) 0%, var(--gold-stamp) 100%);
+            transform: translateY(-50%);
+        }
+        
+        /* Verification stamp effect */
+        .stamp-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .stamp-mark {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--verify-blue) 0%, transparent 70%);
+            border: 3px solid var(--verify-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--verify-blue);
+            transform: rotate(-15deg);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .stamp-container:hover .stamp-mark {
+            opacity: 1;
+        }
+        
+        /* Frosted glass effect */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 243, 199, 0.1);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--vault-navy);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--verify-blue);
+            border-radius: 6px;
+            border: 3px solid var(--vault-navy);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-stamp);
+        }
+        
+        /* Glow effect for links */
+        .glow-link {
+            position: relative;
+            text-decoration: none;
+            color: var(--verify-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .glow-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gold-stamp);
+            transition: width 0.3s ease;
+        }
+        
+        .glow-link:hover::after {
+            width: 100%;
+        }
+        
+        .glow-link:hover {
+            color: var(--gold-stamp);
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        
+        /* Staggered animation delays */
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .timeline-container {
+                padding: 40px 0;
+            }
+            
+            .hero-portrait {
+                max-height: 400px;
+            }
+        }
+        
+        /* Image aspect ratio containers */
+        .img-container {
+            position: relative;
+            overflow: hidden;
+            background: rgba(51, 65, 85, 0.3);
+        }
+        
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        
+        .img-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Polaroid frame effect for film images */
+        .polaroid-frame {
+            padding: 20px;
+            padding-bottom: 60px;
+            background: var(--off-white);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .polaroid-frame:hover {
+            transform: rotate(0deg) translateY(-8px);
+        }
+        
+        .polaroid-caption {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            color: var(--vault-navy);
+            margin-top: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-layer">
+        
+        <!-- Hero Section -->
+        <section class="min-h-screen flex items-center justify-center px-6 py-20 relative">
+            <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="scroll-reveal space-y-6">
+                    <div class="verification-badge inline-block">
+                        <svg class="w-16 h-16 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            <circle cx="12" cy="12" r="11" fill="none" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-5xl md:text-7xl leading-tight">
+                        Protecting Truth.<br/>
+                        Crafting Stories.<br/>
+                        Building Futures.
+                    </h1>
+                    <p class="text-xl md:text-2xl text-yellow-200 font-semibold">
+                        Reality Verification Pioneer | Award-Winning Filmmaker | Social Agility Innovator
+                    </p>
+                    <p class="text-lg text-gray-300 leading-relaxed">
+                        In an age where synthetic media threatens authenticity, Bryan Bakker stands at the intersection of technology and storytelling—verifying truth through blockchain, challenging audiences through cinema, and transforming professionals through immersive training.
+                    </p>
+                    <div class="flex items-center gap-4 pt-6">
+                        <a href="#pillars" class="glow-link text-lg font-semibold">Explore the Three Pillars ↓</a>
+                    </div>
+                </div>
+                
+                <!-- Hero Portrait -->
+                <div class="scroll-reveal delay-2 relative">
+                    <div class="stamp-container">
+                        <img src="Gemini_Generated_Image_h1fjdzh1fjdzh1fj.png" alt="Bryan Bakker Portrait" class="hero-portrait rounded-lg shadow-2xl">
+                        <div class="stamp-mark">✓</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Three Pillars Section -->
+        <section id="pillars" class="py-20 px-6">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl md:text-5xl text-center mb-16 scroll-reveal">
+                    The Three Pillars of <span class="text-blue-400">Verified</span> Innovation
+                </h2>
+                
+                <div class="grid md:grid-cols-3 gap-8">
+                    
+                    <!-- Pillar 1: Reality Verification -->
+                    <div class="pillar-card rounded-xl p-8 scroll-reveal delay-1">
+                        <div class="mb-6">
+                            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-blue-500 mx-auto mb-4 img-container">
+                                <img src="Gemini_Generated_Image_BryanBakker.png" alt="Bizbio CEO" class="w-full h-full">
+                            </div>
+                            <svg class="w-12 h-12 text-blue-500 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-center mb-4">Reality Verification Technologies</h3>
+                        <p class="text-center text-yellow-200 mb-4 italic">Bizbio Inc.</p>
+                        <p class="text-gray-300 leading-relaxed mb-6">
+                            Fighting deepfakes and misinformation through blockchain-backed content verification. In a world of synthetic media, authenticity is the new currency.
+                        </p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Saving local journalism through verified news partnerships</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Blockchain-based content authentication</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Enterprise-grade deepfake detection</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pillar 2: Independent Film -->
+                    <div class="pillar-card rounded-xl p-8 scroll-reveal delay-2">
+                        <div class="mb-6">
+                            <div class="polaroid-frame mx-auto" style="max-width: 200px;">
+                                <img src="Gemini_Generated_Image_31d93431d93431d9.png" alt="Film Festival" class="w-full">
+                                <div class="polaroid-caption">Forest City Film Festival</div>
+                            </div>
+                            <svg class="w-12 h-12 text-amber-500 mx-auto mt-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-center mb-4">Independent Film</h3>
+                        <p class="text-center text-yellow-200 mb-4 italic">Award-Winning Storyteller</p>
+                        <p class="text-gray-300 leading-relaxed mb-6">
+                            Thirty years crafting corporate narratives, now challenging audiences through independent cinema. Stories that unsettle, inspire, and refuse to be forgotten.
+                        </p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-2">
+                                <span class="text-amber-400">★</span>
+                                <span><strong>Worst Fears</strong> – Big Apple Film Festival Honorable Mention</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-amber-400">★</span>
+                                <span><strong>Local Curse</strong> – SoCal Film Awards Winner</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-amber-400">★</span>
+                                <span><strong>Out of the Box</strong> – Best Short Film Winner</span>
+                            </div>
+                            <div class="text-center mt-4">
+                                <span class="text-blue-300 font-mono">40+ Festival Selections</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Pillar 3: Business Simulations -->
+                    <div class="pillar-card rounded-xl p-8 scroll-reveal delay-3">
+                        <div class="mb-6 img-container rounded-lg" style="height: 200px;">
+                            <img src="CrewatESSCShootcrosshatch.jpg" alt="Workshop Training" class="w-full h-full">
+                        </div>
+                        <h3 class="text-2xl font-bold text-center mb-4">Social Agility & Business Simulations</h3>
+                        <p class="text-center text-yellow-200 mb-4 italic">From Railway City Improv</p>
+                        <p class="text-gray-300 leading-relaxed mb-6">
+                            Immersive training for career advancement, anxiety management, and workplace confidence. True professional growth happens through lived experience, not theory.
+                        </p>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Executive presence coaching through improvisation</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Anxiety reduction through experiential learning</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-blue-400">→</span>
+                                <span>Real-time feedback in safe simulation environments</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        
+        <!-- Awards & Recognition Timeline -->
+        <section class="py-20 px-6 relative">
+            <div class="max-w-7xl mx-auto">
+                <h2 class="text-4xl md:text-5xl text-center mb-4 scroll-reveal">
+                    Awards & <span class="text-amber-500">Recognition</span>
+                </h2>
+                <p class="text-center text-gray-400 mb-16 scroll-reveal">International Acclaim from Toronto to Paris</p>
+                
+                <!-- Timeline Background -->
+                <div class="timeline-container">
+                    <div class="timeline-line"></div>
+                    
+                    <!-- Feature Films Section -->
+                    <div class="mb-16 scroll-reveal">
+                        <h3 class="text-2xl font-mono font-bold text-yellow-300 mb-8 text-center">Feature Screenplays</h3>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            
+                            <!-- Worst Fears -->
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Worst Fears</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Honorable Mention – Big Apple Film Festival</p>
+                                    <p>🏆 Semi-Finalist – 26th Fade In Awards</p>
+                                    <p>🏆 Official Selection – Toronto Film & Script Awards</p>
+                                    <p>🏆 Double-Recommend – Stage32 Script Services</p>
+                                    <p>🏆 Semi-Finalist – Flickers Rhode Island</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Local Curse -->
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Local Curse</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Award Winner – SoCal Film Awards</p>
+                                    <p>🏆 Official Selection – Diabolical Horror Film Festival</p>
+                                    <p>🏆 Official Selection – UK Film Festival</p>
+                                    <p>🏆 Semi-Finalist – Forest City Film Festival</p>
+                                    <p>🏆 Quarter-Finalist – Creative World Awards</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Glory Everlasting -->
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Glory Everlasting</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Finalist – Creative World Awards</p>
+                                    <p>🏆 Official Selection – Santa Barbara International</p>
+                                    <p>🏆 Double-Recommend – Stage32 Coverage</p>
+                                    <p>🏆 Award Winner – Fantasy/Sci-Fi Festival</p>
+                                    <p>🏆 Finalist – StoryPros Contest</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Short Films Section -->
+                    <div class="scroll-reveal">
+                        <h3 class="text-2xl font-mono font-bold text-yellow-300 mb-8 text-center">Short Films</h3>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Out of the Box</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Best Short Film – 4th Dimension International</p>
+                                    <p>🏆 Official Selection – San Francisco Another Hole in the Head</p>
+                                    <p>🏆 Finalist – Forest City Film Festival</p>
+                                </div>
+                            </div>
+                            
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Home of the Best Hummers</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Merit Award – WRPN.TV Global Competition</p>
+                                    <p>🏆 Official Selection – Toronto Lift-off</p>
+                                    <p>🏆 Official Selection – Lift-off Global Network</p>
+                                </div>
+                            </div>
+                            
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">Ancestry.com Parody</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Finalist – JellyFEST Film Festival</p>
+                                    <p>🏆 Honorable Mention – One-Reeler Competition</p>
+                                    <p>🏆 Official Selection – Toronto Shorts International</p>
+                                </div>
+                            </div>
+                            
+                            <div class="award-card rounded-lg p-6">
+                                <h4 class="film-title text-xl font-bold text-blue-300 mb-3">The Emptynesters Gang</h4>
+                                <div class="space-y-2 text-sm text-gray-300">
+                                    <p>🏆 Semi-Finalist – Night of Comedy Shorts</p>
+                                    <p>🏆 Official Selection – International Shorts</p>
+                                    <p>🏆 Official Selection – New York Lift-off</p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Global Screening Map -->
+                <div class="mt-16 glass-card rounded-xl p-8 scroll-reveal">
+                    <h3 class="text-2xl font-mono text-center mb-6">International Screening Presence</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="img-container rounded-lg" style="height: 300px;">
+                            <img src="2O9A8856.jpg" alt="Film Crew" class="w-full h-full">
+                        </div>
+                        <div class="flex flex-col justify-center">
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div class="text-center p-4 bg-slate-800 bg-opacity-50 rounded-lg">
+                                    <p class="text-3xl font-bold text-blue-400">40+</p>
+                                    <p class="text-gray-300">Festival Selections</p>
+                                </div>
+                                <div class="text-center p-4 bg-slate-800 bg-opacity-50 rounded-lg">
+                                    <p class="text-3xl font-bold text-amber-400">15+</p>
+                                    <p class="text-gray-300">Awards Won</p>
+                                </div>
+                                <div class="text-center p-4 bg-slate-800 bg-opacity-50 rounded-lg">
+                                    <p class="text-3xl font-bold text-blue-400">8</p>
+                                    <p class="text-gray-300">Countries</p>
+                                </div>
+                                <div class="text-center p-4 bg-slate-800 bg-opacity-50 rounded-lg">
+                                    <p class="text-3xl font-bold text-amber-400">3</p>
+                                    <p class="text-gray-300">Feature Scripts</p>
+                                </div>
+                            </div>
+                            <p class="text-gray-400 mt-6 text-center italic">
+                                Toronto • New York • Los Angeles • Paris • Amsterdam • San Francisco • Rhode Island • London
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- The Evolution: Railway City to Business Simulations -->
+        <section class="py-20 px-6">
+            <div class="max-w-5xl mx-auto glass-card rounded-xl p-12 scroll-reveal">
+                <h2 class="text-4xl font-bold text-center mb-8">The Evolution: <span class="text-blue-400">From Stage to Strategy</span></h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 items-center mb-8">
+                    <div>
+                        <img src="EmptynesterCastandCrew.jpg" alt="Emptynesters Cast and Crew" class="rounded-lg shadow-xl">
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-yellow-300">Railway City Improv Legacy</h3>
+                        <p class="text-gray-300 leading-relaxed mb-4">
+                            What began as theatrical improvisation evolved into something far more powerful: a laboratory for human connection, rapid adaptation, and fearless communication.
+                        </p>
+                        <p class="text-gray-300 leading-relaxed">
+                            The same principles that make great improvisers—active listening, "yes, and" thinking, pattern recognition—are the foundations of executive presence and workplace agility.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="border-t border-blue-500 border-opacity-30 pt-8">
+                    <h3 class="text-2xl font-semibold mb-4 text-center">Business Simulations Today</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                            <h4 class="font-semibold text-lg mb-2">Career Advancement</h4>
+                            <p class="text-gray-400 text-sm">Executive presence through experiential learning</p>
+                        </div>
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                            <h4 class="font-semibold text-lg mb-2">Anxiety Reduction</h4>
+                            <p class="text-gray-400 text-sm">Safe spaces for high-stakes practice</p>
+                        </div>
+                        <div>
+                            <svg class="w-12 h-12 mx-auto mb-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                            <h4 class="font-semibold text-lg mb-2">Social Agility</h4>
+                            <p class="text-gray-400 text-sm">Adapting to any professional context</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-8 text-center">
+                    <img src="GroupPhoto_BizbioPromo.jpg" alt="Bizbio Team" class="rounded-lg shadow-xl mx-auto max-w-2xl">
+                    <p class="text-gray-400 mt-4 italic">The Bizbio team: where improv meets innovation</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Footer -->
+        <footer class="py-16 px-6 border-t border-blue-500 border-opacity-30">
+            <div class="max-w-4xl mx-auto text-center scroll-reveal">
+                <h2 class="text-4xl font-bold mb-6">Let's Verify the <span class="text-blue-400">Future</span> Together</h2>
+                <p class="text-xl text-gray-300 mb-8">
+                    Whether you're fighting misinformation, seeking award-winning storytelling, or transforming your team's social agility—let's connect.
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-8">
+                    <a href="mailto:info@bluefoodfilms.com" class="glass-card rounded-lg p-6 hover:border-blue-500 border border-transparent transition-all">
+                        <svg class="w-8 h-8 mx-auto mb-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                        <p class="text-lg font-semibold mb-1">Email</p>
+                        <p class="text-blue-300 glow-link">info@bluefoodfilms.com</p>
+                    </a>
+                    
+                    <a href="tel:519-851-8614" class="glass-card rounded-lg p-6 hover:border-blue-500 border border-transparent transition-all">
+                        <svg class="w-8 h-8 mx-auto mb-3 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                        <p class="text-lg font-semibold mb-1">Phone</p>
+                        <p class="text-blue-300 glow-link">519-851-8614</p>
+                    </a>
+                </div>
+                
+                <div class="text-gray-400 space-y-2">
+                    <p class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        Based in St. Thomas, Ontario – Working Globally
+                    </p>
+                    <p class="flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Verified Human. No AI Ghostwriters.
+                    </p>
+                </div>
+                
+                <div class="mt-12 pt-8 border-t border-gray-700">
+                    <p class="text-sm text-gray-500">
+                        © 2026 Bryan Bakker / Bizbio Inc. All rights reserved. All film stills, screenshots, and intellectual property are protected by copyright.
+                    </p>
+                </div>
+            </div>
+        </footer>
+        
+    </div>
+    
+    <script>
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger verification badge animation
+                    if (entry.target.classList.contains('verification-badge')) {
+                        entry.target.classList.add('visible');
+                    }
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all scroll-reveal elements
+        document.querySelectorAll('.scroll-reveal').forEach(el => observer.observe(el));
+        document.querySelectorAll('.verification-badge').forEach(el => observer.observe(el));
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Parallax effect for hero section
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroSection = document.querySelector('section');
+            if (heroSection) {
+                heroSection.style.transform = `translateY(${scrolled * 0.3}px)`;
+                heroSection.style.opacity = 1 - (scrolled / 1000);
+            }
+        });
+        
+        // Add dynamic timestamp to verification badges
+        const verificationBadges = document.querySelectorAll('.verification-badge');
+        verificationBadges.forEach(badge => {
+            const timestamp = document.createElement('span');
+            timestamp.className = 'text-xs text-gray-500 block mt-2 font-mono';
+            timestamp.textContent = `Verified: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+            badge.parentElement.appendChild(timestamp);
+        });
+    </script>
+</body>
+</html>
