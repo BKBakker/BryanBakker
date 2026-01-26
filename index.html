@@ -829,4 +829,12 @@
         const verificationBadges = document.querySelectorAll('.verification-badge');
         verificationBadges.forEach(badge => {
             const timestamp = document.createElement('span');
-            timestamp.className = 'text-xs text-gray-500 block mt-2 font
+            timestamp.className = 'text-xs text-gray-500 block mt-2 font-mono';
+            timestamp.textContent = `Verified: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}`;
+            if (badge.parentElement) {
+                badge.parentElement.appendChild(timestamp);
+            }
+        });
+    </script>
+</body>
+</html>
